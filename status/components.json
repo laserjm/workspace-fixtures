@@ -1,0 +1,7 @@
+{
+  "components": [
+    { "id": "app", "name": "App", "status": "operational" },
+    { "id": "sign-in", "name": "Sign-in", "status": "degraded" },
+    { "id": "database", "name": "Database", "status": "operational" }
+  ]
+}

@@ -16,3 +16,5 @@ CI response read by the provider.
 The downloaded API answers live beside the GitHub provider in
 `workspace-prototype/src/modules/integrations/providers/github/fixtures/`.
 Its README records the commands needed to capture fresh answers.
+
+The `status/` folder holds a synthetic status page (seed/seed.sh).
