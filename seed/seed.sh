@@ -5,8 +5,10 @@
 #
 # Needs only `gh`, signed in with write access to the repository. Every record carries the label
 # `fixture` and one `case/…` label. A case whose label is already on an issue or pull request is
-# skipped, so running the script again changes nothing; delete a case's record (or its label) to
-# seed it again. Nothing here touches files that already exist on the default branch except README.md.
+# skipped, so running the script again changes nothing. The label goes on when the record is
+# created: a run that stops halfway leaves that case half-seeded, so fix it by hand or start over in
+# a fresh repository. The merged pull request can't be seeded twice in one repository (its files
+# are on the default branch by then). Nothing here touches existing files except README.md.
 set -euo pipefail
 
 repo=${1:-laserjm/workspace-fixtures}
@@ -88,7 +90,8 @@ done
 
 # --- case/open-issue: an open issue with a few comments --------------------------------------
 
-if n=$(seeded case/open-issue) && [ -n "$n" ]; then
+n=$(seeded case/open-issue)
+if [ -n "$n" ]; then
   say case/open-issue "#$n (already seeded)"
 else
   url=$(open_issue_body | gh issue create --repo "$repo" --assignee @me \
@@ -111,7 +114,8 @@ fi
 
 # --- case/not-planned: an issue closed as not planned ----------------------------------------
 
-if n=$(seeded case/not-planned) && [ -n "$n" ]; then
+n=$(seeded case/not-planned)
+if [ -n "$n" ]; then
   say case/not-planned "#$n (already seeded)"
 else
   url=$(gh issue create --repo "$repo" --label fixture --label case/not-planned \
@@ -127,7 +131,8 @@ fi
 
 # --- case/merged-pr: merged, with a review, an inline comment, several files and CI on its head -
 
-if n=$(seeded case/merged-pr) && [ -n "$n" ]; then
+n=$(seeded case/merged-pr)
+if [ -n "$n" ]; then
   say case/merged-pr "#$n (already seeded)"
 else
   b=fixtures/status-page
@@ -180,13 +185,19 @@ MD
 }
 JSON
   gh pr comment "$n" --repo "$repo" --body "The failing \`fixtures/links\` status is deliberate: it is sample data for a red CI state." >/dev/null
-  gh pr merge "$n" --repo "$repo" --merge >/dev/null
+  # GitHub computes mergeability after the pull request opens; retry until it can merge.
+  for try in 1 2 3 4 5; do
+    gh pr merge "$n" --repo "$repo" --merge >/dev/null 2>&1 && break
+    [ "$try" = 5 ] && { echo "could not merge #$n" >&2; exit 1; }
+    sleep 3
+  done
   say case/merged-pr "#$n (head $head)"
 fi
 
 # --- case/draft-pr: an open draft pull request -----------------------------------------------
 
-if n=$(seeded case/draft-pr) && [ -n "$n" ]; then
+n=$(seeded case/draft-pr)
+if [ -n "$n" ]; then
   say case/draft-pr "#$n (already seeded)"
 else
   b=fixtures/status-history

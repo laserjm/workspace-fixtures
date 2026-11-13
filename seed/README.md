@@ -15,8 +15,10 @@ every push and pull request). The script adds no workflow: that would need the t
 `workflow` scope.
 
 Each record carries the label `fixture` and one case label. A case whose label is already on a
-record is skipped, so a second run changes nothing. To seed a case again, remove its label from
-the old record (or delete the issue) and run the script.
+record is skipped, so a second run changes nothing. The label goes on when the record is created,
+so a run that stops halfway leaves that case half-seeded: finish it by hand, or seed a fresh
+repository. An issue case can be seeded again after deleting the issue; the merged pull request
+can't be seeded twice in one repository, because its files are on the default branch by then.
 
 | Label | Record |
 | --- | --- |
