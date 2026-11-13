@@ -1,0 +1,9 @@
+{
+  "name": "Workspace sandbox launch",
+  "format": "markdown",
+  "tasks": [
+    { "title": "Write documentation", "done": true },
+    { "title": "Confirm release owner", "done": false },
+    { "title": "Publish announcement", "done": false }
+  ]
+}
